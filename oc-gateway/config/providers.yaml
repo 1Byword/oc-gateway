@@ -1,0 +1,58 @@
+# Provider / model / alias configuration. Edit this file (or use the dashboard) - no code changes needed.
+#
+# IMPORTANT: model ids below are EXAMPLES that were plausible when this file was written. Free model lists rotate
+# without notice. Use the dashboard "Test connection" (GET /models) to see what the provider offers today, put real ids here,
+# then press "Probe" so the gateway verifies chat / streaming / tool-calling by actually trying them.
+# Nothing is advertised or used for tool calls until a probe has verified it.
+
+routing:
+  default_strategy: failover        # priority | balanced | failover   (changeable at runtime from the dashboard)
+  failback_seconds: 900
+  max_attempts: 4
+  require_verified_tools: true
+  balanced_weights: {quality: 0.5, speed: 0.2, reliability: 0.3}
+  cooldowns: {rate_limit: 60, quota: 3600, server: 120, timeout: 60, connection: 120}
+
+context:
+  compaction: false                 # OpenCode compacts its own sessions. true = gateway safety net (explicit, header-flagged)
+  safety_margin: 0.90
+
+providers:
+  openrouter:
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY          # or add keys from the dashboard (stored encrypted)
+    priority: 10                              # lower number = preferred
+    limits: {rpm: 20, rpd: 50}                # DOCUMENTED free-model limits (20/min; 50/day, 1000/day after >=$10 lifetime credits).
+                                              # Treated as ESTIMATES: the gateway counts its own requests only.
+    quota_reset_utc: "00:00"
+    quota_resets_daily: true
+    models:
+      - {id: "qwen/qwen3-coder:free", quality: 8, speed: 5, context: 0, claims: [chat, stream, tools]}   # EXAMPLE id - verify
+
+  groq:
+    base_url: https://api.groq.com/openai/v1
+    api_key_env: GROQ_API_KEY
+    priority: 20
+    limits: {}                                # unknown here: left empty rather than invented. Groq returns x-ratelimit-* headers,
+                                              # which the gateway records as VERIFIED remaining quota when present.
+    models:
+      - {id: "llama-3.3-70b-versatile", quality: 7, speed: 9, context: 0, claims: [chat, stream, tools]}  # EXAMPLE id - verify
+
+  nvidia:
+    base_url: https://integrate.api.nvidia.com/v1
+    api_key_env: NVIDIA_API_KEY
+    priority: 30
+    limits: {}
+    models:
+      - {id: "meta/llama-3.3-70b-instruct", quality: 7, speed: 5, context: 0, claims: [chat, stream, tools]}  # EXAMPLE id - verify
+
+aliases:                                       # these are the only model names OpenCode ever sees
+  coder:
+    members:
+      - {provider: openrouter, model: "qwen/qwen3-coder:free"}
+      - {provider: groq, model: "llama-3.3-70b-versatile"}
+      - {provider: nvidia, model: "meta/llama-3.3-70b-instruct"}
+  fast:
+    members:
+      - {provider: groq, model: "llama-3.3-70b-versatile"}
+      - {provider: nvidia, model: "meta/llama-3.3-70b-instruct"}

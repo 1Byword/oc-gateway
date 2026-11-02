@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "gateway/coder",
+  "small_model": "gateway/fast",
+  "instructions": ["PROJECT_STATE.md", "AGENTS.md"],
+  "permission": { "*": "ask" },
+  "provider": {
+    "gateway": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Cloud Gateway",
+      "options": {
+        "baseURL": "https://YOUR-DOMAIN/v1",
+        "apiKey": "{env:GATEWAY_KEY}"
+      },
+      "models": {
+        "coder": { "name": "Coder (auto-failover)", "tool_call": true, "limit": { "context": 32000, "output": 4096 } },
+        "fast":  { "name": "Fast (auto-failover)",  "tool_call": true, "limit": { "context": 32000, "output": 4096 } }
+      }
+    }
+  }
+}

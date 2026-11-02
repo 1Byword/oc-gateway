@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Gateway dashboard</title>
+<style>
+ :root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--line:#ddd;--ok:#0a7d33;--warn:#b26a00;--bad:#b3261e;--card:#f7f7f8}
+ @media (prefers-color-scheme:dark){:root{--bg:#161618;--fg:#e8e8ea;--mut:#999;--line:#333;--card:#202024;--ok:#4cc77a;--warn:#e0a040;--bad:#ff7b72}}
+ body{font:14px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--fg);margin:0;padding:16px;max-width:1200px;margin:auto}
+ h1{font-size:20px} h2{font-size:16px;margin:0 0 8px} .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin:12px 0}
+ table{border-collapse:collapse;width:100%} th,td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top;font-size:13px}
+ .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)} .mut{color:var(--mut)} .wrap{overflow-x:auto}
+ button,input,select{font:inherit;padding:3px 7px;margin:2px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px}
+ button{cursor:pointer} .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+</style></head><body>
+<h1>AI Gateway dashboard</h1>
+<div id="login" class="card"><h2>Admin login</h2>
+ <form id="loginform"><input id="tok" type="password" autocomplete="off" placeholder="admin token" size="40"><button>Sign in</button></form>
+ <div class="mut">The token is kept in this tab's sessionStorage only. API keys are never shown: only the last 4 characters.</div></div>
+<div id="main" hidden>
+ <div class="card"><div class="row"><b>Routing strategy:</b><select id="strategy"></select><button id="setstrat">Apply</button>
+  <span class="mut" id="ver"></span><button id="refresh">Refresh</button><button id="backup">Backup DB</button></div></div>
+ <div id="providers"></div>
+ <div class="card"><h2>Add provider</h2><div class="row">
+  <input id="np_name" placeholder="name (a-z, 0-9, -)"><input id="np_url" placeholder="https://api.example.com/v1" size="34">
+  <input id="np_models" placeholder="model ids, comma separated" size="30"><input id="np_alias" placeholder="add to alias (e.g. coder)" size="18">
+  <input id="np_prio" type="number" value="100" style="width:70px"><button id="addprov">Add</button></div>
+  <div class="mut">New models are unverified until you press Probe. Add a key afterwards.</div></div>
+ <div class="card"><h2>Recent requests (journal)</h2><div class="wrap"><table id="journal"></table></div></div>
+ <div class="card"><h2>Events (rate limits, quota, failovers, key problems)</h2><div class="wrap"><table id="events"></table></div></div>
+ <pre id="msg" class="mut"></pre>
+</div>
+<script src="/dashboard/app.js"></script></body></html>

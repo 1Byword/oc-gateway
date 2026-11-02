@@ -1,0 +1,22 @@
+{$GATEWAY_DOMAIN} {
+	# Automatic HTTPS (Let's Encrypt). Compression is deliberately off: it can buffer SSE streams.
+	@admin_blocked {
+		path /admin/* /dashboard /dashboard/*
+		not remote_ip {$ADMIN_ALLOW_CIDRS}
+	}
+	respond @admin_blocked "forbidden" 403
+
+	request_body {
+		max_size 12MB
+	}
+	reverse_proxy gateway:8080 {
+		flush_interval -1
+		transport http {
+			response_header_timeout 10m
+		}
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}
